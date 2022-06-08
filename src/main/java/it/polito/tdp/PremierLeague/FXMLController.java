@@ -20,6 +20,8 @@ import javafx.scene.control.TextField;
 public class FXMLController {
 
 	private Model model;
+	
+	boolean grafoCreato= false;
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -48,15 +50,58 @@ public class FXMLController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	
+    	try {
+    		int combo= cmbMatch.getValue().getMatchID();
+    		String result= this.model.creaGrafo(combo);
+    		txtResult.clear();
+    		txtResult.appendText(result);
+    		grafoCreato= true;
+    		
+    	}catch(NullPointerException e) {
+    		
+    		txtResult.clear();
+    		txtResult.appendText("Selezionare un match!\n");
+    		
+    	}
+    	
     }
 
     @FXML
-    void doGiocatoreMigliore(ActionEvent event) {    	
+    void doGiocatoreMigliore(ActionEvent event) {
+    	
+    	try {
+    		String result= this.model.giocatoreMigliore();
+        	txtResult.setText(result+"\n");
+    		
+    	}catch(NullPointerException e) {
+    		txtResult.setText("Devi prima creare il grafo!\n");
+    	}
+    	
     	
     }
     
     @FXML
     void doSimula(ActionEvent event) {
+    	
+    	if(grafoCreato==true) {
+    	
+    	try {
+    		doGiocatoreMigliore(event);
+    		txtResult.clear();
+        	int azioni= Integer.parseInt(txtN.getText());
+        	txtResult.setText(this.model.finale(azioni));
+    		
+    	}catch(NumberFormatException e){
+    		txtResult.setText("Inserire un numero di azioni valido!\n");
+    	}
+    	}
+    	else {
+    		txtResult.appendText("E' prima necessario creare il grafo!\n");
+    	}
+    	
+    	
+    	
+    	
 
     }
 
@@ -73,5 +118,7 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	cmbMatch.getItems().clear();
+    	cmbMatch.getItems().addAll(this.model.getAllMatches());
     }
 }
